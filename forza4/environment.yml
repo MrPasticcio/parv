@@ -1,0 +1,13 @@
+name: forza4
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy=1.20.2
+  - pandas=1.2.4
+  - pika=1.2.0
+  - python=3.7.10
+  - scipy=1.6.2
+  - tensorflow=2.4.0
+  - tensorflow-base=2.4.0
+  - tensorflow-estimator=2.4.0
