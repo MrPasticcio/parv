@@ -1,7 +1,8 @@
 import logging
+import numpy as np
 from copy import deepcopy
 
-from player import *
+from forza4 import *
 
 
 class Board:
