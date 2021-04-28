@@ -1,8 +1,9 @@
 import logging
-import numpy as np
 from copy import deepcopy
 
-from forza4 import *
+import numpy as np
+
+from player import AnnoyingPlayer, AnnoyingPlayerV2, VerticalPlayer, RandomOpponent
 
 
 class Board:
@@ -26,7 +27,6 @@ class Board:
 
     def is_valid_move(self, position):
         x = int(position)
-
         try:
             assert 0 <= position <= 6, 'The position must be between 0 and 6'
             y = 5 - np.abs(self._board[:, x]).sum()
@@ -37,6 +37,10 @@ class Board:
             valid_move = False
 
         return valid_move
+
+    @property
+    def valid_moves(self):
+        return np.where((6 - np.abs(self._board).sum(0)) > 0)[0].tolist()
 
     @staticmethod
     def is_winning_configuration(configuration):
@@ -135,9 +139,9 @@ if __name__ == '__main__':
 
     players_pool = [
         RandomOpponent(),
-        VerticalPlayer(),
         AnnoyingPlayer(),
         AnnoyingPlayerV2(),
+        VerticalPlayer(),
     ]
 
     winners = []
@@ -157,15 +161,15 @@ if __name__ == '__main__':
             current_player = current_players[game.current_player]
             players_move = current_player.move(
                 game.latest_configuration,
-                game.board.is_valid_move)
+                game.board.valid_moves)
             game.insert(players_move)
 
         if game.winner == 0:
             for p in current_players.values():
-                p.notify_results('draw')
+                p.notify_results('draw', game.latest_configuration)
         else:
-            current_players[game.winner].notify_results('won')
-            current_players[-1 * game.winner].notify_results('lost')
+            current_players[game.winner].notify_results('won', game.latest_configuration)
+            current_players[-1 * game.winner].notify_results('lost', game.latest_configuration)
 
         print(game.board)
         players.extend([p1, p2])
@@ -174,6 +178,7 @@ if __name__ == '__main__':
             winners.append(p1 if game.winner == -1 else p2)
             print(f'P{p1} vs P{p2}: P{winners[-1]} won!')
         else:
+            winners.append(None)
             print(f'P{p1} vs P{p2}: draw!')
 
         print(game.actions)
@@ -182,8 +187,13 @@ if __name__ == '__main__':
             played = players.count(i)
             won = winners.count(i)
 
-            wr = won / played if played > 0 else 0
+            recent_played = players[-500:].count(i)
+            recent_won = winners[-250:].count(i)
 
-            print(f'{p.name if hasattr(p, "name") else i}\tplayed:\t{played}\t\twin rate:\t{wr:.2%}')
+            wr = won / played if played > 0 else 0
+            recent_wr = recent_won / recent_played if recent_played > 0 else 0
+
+            print(f'{p.name if hasattr(p, "name") else i}\tplayed:\t{played}'
+                  f'\t\twin rate:\t{wr:.2%}\t\trecent win rate:\t{recent_wr:.2%}')
 
         game.reset()
