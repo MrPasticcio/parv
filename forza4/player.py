@@ -18,7 +18,7 @@ class Player:
 
 
 class RandomOpponent(Player):
-    def move(self, configuration, valid_moves):
+    def move(self, configuration, valid_moves, player_id):
         return random.sample(valid_moves, 1)[0]
 
 
@@ -27,7 +27,7 @@ class VerticalPlayer(Player):
         super().__init__()
         self.bet = np.random.randint(0, 7)
 
-    def move(self, configuration, valid_moves):
+    def move(self, configuration, valid_moves, player_id):
         if self.bet not in valid_moves:
             self.bet = random.sample(valid_moves, 1)[0]
 
@@ -36,7 +36,7 @@ class VerticalPlayer(Player):
 
 class AnnoyingPlayer(Player):
 
-    def move(self, configuration, valid_moves):
+    def move(self, configuration, valid_moves, player_id):
         occupied = np.abs(configuration).sum(0)
         order = sorted(range(7), key=lambda x: occupied[x], reverse=True)
         sorted_occupied = sorted(occupied, reverse=True)
@@ -53,8 +53,8 @@ class AnnoyingPlayer(Player):
 
 class AnnoyingPlayerV2(Player):
 
-    def move(self, configuration, valid_moves):
-        conf = -1 * configuration
+    def move(self, configuration, valid_moves, player_id):
+        conf = player_id * configuration
         occupied = np.abs(conf).sum(0)
         opponent_occupation = -1 * np.clip(conf, -1, 0).sum(0)
 
