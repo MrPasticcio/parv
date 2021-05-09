@@ -58,7 +58,7 @@ class Board:
         for k in range(-2, 3):
             diag_left = configuration[np.eye(6, 7, k, dtype=bool)]
             check_sequence(diag_left)
-            diag_right = configuration[np.eye(6, 7, k, dtype=bool)]
+            diag_right = configuration[np.flip(np.eye(6, 7, k, dtype=bool), axis=1)]
             check_sequence(diag_right)
 
         for row in configuration:
@@ -161,7 +161,8 @@ if __name__ == '__main__':
             current_player = current_players[game.current_player]
             players_move = current_player.move(
                 game.latest_configuration,
-                game.board.valid_moves)
+                game.board.valid_moves,
+                game.current_player)
             game.insert(players_move)
 
         if game.winner == 0:
